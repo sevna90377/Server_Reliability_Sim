@@ -19,11 +19,40 @@ void Server_system::make_sample() {
     server_graph.add_edge(EU, AF, 170);
 }
 
+Server* Server_system::join_server(Player* player, Server* server) {
+    if (server->joinable) {
+        server->addPlayer(player);
+        return server;
+    }
+    else {
+        return assign_server(player);
+    }
+}
+
+Server* Server_system::assign_server(Player* player)
+{
+    for (auto s : server_graph.servers) {
+        if (s.first->joinable) {
+            s.first->addPlayer(player);
+            return s.first;
+        }
+    }
+    return nullptr;
+}
+
+Server* Server_system::random_server()
+{
+    int index = int(RNG::getLinear() * 100) % server_graph.servers.size();
+    auto it = server_graph.servers.begin();
+    std::advance(it, index);
+    return it->first;
+}
+
 void Server_system::print_info() {
     system("cls");
     std::cout << "Server\tTyp\tPojemnosc\n";
 
-    for (auto& pair : server_graph.graph) {
+    for (auto& pair : server_graph.servers) {
         std::cout << pair.first->info();
     }
 }

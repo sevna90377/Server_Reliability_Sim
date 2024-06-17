@@ -12,6 +12,11 @@ public:
         }
     }
 
+    //dla graczy
+    Server* join_server(Player* player, Server* server);
+    Server* assign_server(Player* player);
+    Server* random_server();
+
     void print_info();
 
 private:
@@ -29,16 +34,16 @@ private:
             Element* next;
         };
 
-        std::unordered_map<Server*, Element*> graph;
+        std::unordered_map<Server*, Element*> servers;
 
         void add_edge(Server* v1, Server* v2, int distance) {
 
             Graph::Element* newElement = new Graph::Element{ v2, distance, nullptr };
-            if (graph[v1] == nullptr) {
-                graph[v1] = newElement;
+            if (servers[v1] == nullptr) {
+                servers[v1] = newElement;
             }
             else {
-                Graph::Element* current = graph[v1];
+                Graph::Element* current = servers[v1];
                 while (current->next != nullptr) {
                     current = current->next;
                 }
@@ -47,11 +52,11 @@ private:
 
             newElement = new Graph::Element{ v1, distance, nullptr };
 
-            if (graph[v2] == nullptr) {
-                graph[v2] = newElement;
+            if (servers[v2] == nullptr) {
+                servers[v2] = newElement;
             }
             else {
-                Graph::Element* current = graph[v2];
+                Graph::Element* current = servers[v2];
                 while (current->next != nullptr) {
                     current = current->next;
                 }
@@ -63,7 +68,7 @@ private:
         void delete_graph() {
             Graph::Element* current;
             Graph::Element* next;
-            for (auto& pair : graph) {
+            for (auto& pair : servers) {
                 current = pair.second;
                 while (current != nullptr) {
                     next = current->next;

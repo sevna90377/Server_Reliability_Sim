@@ -22,6 +22,7 @@ public:
     ~Server() = default;
 
     bool joinable;
+    int ping;
 
 private:
     std::string name;
@@ -29,7 +30,6 @@ private:
     Type type;
     int capacity;
     int currently;
-    int ping;
     float error_percent;
 
     //Shutdown *
@@ -37,7 +37,7 @@ private:
 
 public:
     void addPlayer(Player* player);
-    void removePlayer();
+    void removePlayer(Player* player);
     std::string info();
 
     //shutdown();

@@ -24,6 +24,7 @@
     <ProjectGuid>{06a19342-5170-400c-be67-99ca10b3349a}</ProjectGuid>
     <RootNamespace>Project5</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Server_Reliability</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -104,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,13 +129,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Box_Muller_Transform.h" />
+    <ClInclude Include="Linear_Congruential_RNG.h" />
+    <ClInclude Include="Normal_distribution_RNG.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Server_system.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Box_Muller_Transform.cpp" />
+    <ClCompile Include="Linear_Congruential_RNG.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Normal_distribution_RNG.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Server_system.cpp" />

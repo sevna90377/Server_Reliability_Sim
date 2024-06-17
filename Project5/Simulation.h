@@ -13,6 +13,7 @@ public:
         this->max_ticks = max_ticks;
         tick = 0;
         running = false;
+
     }
     ~Simulation() {
         this->stop();
@@ -25,6 +26,8 @@ public:
     void stop();
 
 private:
+    Server_system* servers;
+
     int max_players;
     int max_ticks;
     int tick;
@@ -35,6 +38,4 @@ private:
     //zmienne potrzebne do synchronizacji graczy
     std::thread simulationThread;
     std::vector<Player*> players;
-
-    Server_system* servers;
 };

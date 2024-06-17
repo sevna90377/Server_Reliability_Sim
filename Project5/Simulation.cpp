@@ -1,13 +1,13 @@
 #include "Simulation.h"
-#include <thread>
 
 void Simulation::start() {
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     running = true;
     
     servers = new Server_system(true);
     
     for (int i = 0; i < max_players; i++) {
-        Player* p = new Player(i);
+        Player* p = new Player(i, servers);
         players.emplace_back(p);
         p->start();
     }
@@ -28,5 +28,8 @@ void Simulation::run() {
 }
 
 void Simulation::stop() {
+    for (Player* player : players) {
+        player->stop();
+    }
     running = false;
 }

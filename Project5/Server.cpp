@@ -4,6 +4,17 @@ std::string Server::info() {
     return name + "\t" + type_toString() + "\t" + std::to_string(currently) + "/" + std::to_string(capacity) + "\n";
 }
 
+void Server::ping_calc()
+{
+    if (currently >= capacity) {
+        joinable = false;
+    }
+    else if (currently < capacity) {
+        joinable = true;
+    }
+    ping = currently / capacity;
+}
+
 std::string Server::type_toString() {
     switch (type) {
     case PvP:
@@ -18,8 +29,16 @@ std::string Server::type_toString() {
     return "undefined";
 }
 
-void Server::addPlayer(Player* player) {
+void Server::addPlayer(Player* player) 
+{
     current_players.emplace_back(player);
     currently++;
-    //ping_calc();
+    ping_calc();
+}
+
+void Server::removePlayer(Player* player)
+{
+    current_players.remove(player);
+    currently--;
+    ping_calc();
 }
