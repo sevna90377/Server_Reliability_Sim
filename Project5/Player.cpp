@@ -8,7 +8,7 @@ void Player::tick() {
             join_server();
         }
         else {
-            quit_server();
+            quit_server(false);
         }
     }
     calc_satisfaction();
@@ -24,7 +24,7 @@ void Player::join_server() {
     }
 }
 
-void Player::quit_server()
+void Player::quit_server(bool forced)
 {
     std::lock_guard<std::mutex> lock(subsequent_join);
     current_server->removePlayer(this);
@@ -32,12 +32,22 @@ void Player::quit_server()
     srand(time(0));
     ticks_left = static_cast<int>(RNG::getNormal() * 10);
     playing = false;
+    if (forced) {
+        satisfaction = satisfaction - 0.3;
+    }
 }
 
 void Player::calc_satisfaction()
 {
     if (playing) {
-        int ping_satisfaction = current_server->ping;
+        int ping = current_server->ping; //+ server_distance
+        if (ping > ping_tolerance) {
+            satisfaction = satisfaction - (ping - ping_tolerance) * 0.1;
+        }
+        if (satisfaction < 0.1) {
+            stop();
+        }
+        std::cout << player_id << "\t: " << ping << "/" << ping_tolerance << "\t: " << satisfaction  << std::endl;
     }
 }
 
@@ -45,11 +55,10 @@ void Player::calc_satisfaction()
 void Player::start() {
     alive = true;
     closest_server = server_system->random_server();
+    internet = RNG::getNormal() * 4 + 1;
+    satisfaction = RNG::getNormal();
+    ping_tolerance = int(RNG::getNormal() * 100 + 30);
     player_thread = std::thread(&Player::live, this);
-    satisfaction = 0.5;
-    PVP_preference = 0.5;
-    PVE_preference = 0.5;
-    RP_preference = 0.5;
 }
 
 void Player::stop() {

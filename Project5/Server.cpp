@@ -12,7 +12,7 @@ void Server::ping_calc()
     else if (currently < capacity) {
         joinable = true;
     }
-    ping = currently / capacity;
+    ping = int(currently * currently / capacity) + 5;
 }
 
 std::string Server::type_toString() {
