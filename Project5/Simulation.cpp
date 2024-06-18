@@ -23,8 +23,12 @@ void Simulation::run() {
         for (Player* player : players) {
             player->synchronise();
         }
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    double mean = 0;
+    for (auto player : players) {
+        mean += player->satisfaction;
+    }
+    std::cout << "Œrednia satysfakcja graczy po zakoñczeniu symulacji: " << mean / players.size() << std::endl;
 }
 
 void Simulation::stop() {
