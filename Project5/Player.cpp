@@ -33,31 +33,34 @@ void Player::quit_server(bool forced)
     ticks_left = static_cast<int>(RNG::getNormal() * 10);
     playing = false;
     if (forced) {
-        satisfaction = satisfaction - 0.3;
+        satisfaction = satisfaction - 0.1;
     }
 }
 
 void Player::calc_satisfaction()
 {
     if (playing) {
-        int ping = current_server->ping; //+ server_distance
+        ping = (current_server->ping + server_system->calc_distance(closest_server, current_server)) * internet;
         if (ping > ping_tolerance) {
-            satisfaction = satisfaction - (ping - ping_tolerance) * 0.1;
+            satisfaction -= (ping - ping_tolerance) * 0.1;
         }
-        if (satisfaction < 0.1) {
-            stop();
+        else {
+            satisfaction += 0.01;
         }
-        std::cout << player_id << "\t: " << ping << "/" << ping_tolerance << "\t: " << satisfaction  << std::endl;
+    }
+    else {
+        if (satisfaction < 1) {
+            satisfaction = (satisfaction + 0.05) * 1.2;
+        }
     }
 }
-
 
 void Player::start() {
     alive = true;
     closest_server = server_system->random_server();
-    internet = RNG::getNormal() * 4 + 1;
+    internet = RNG::getNormal() + 1;
     satisfaction = RNG::getNormal();
-    ping_tolerance = int(RNG::getNormal() * 100 + 30);
+    ping_tolerance = int(RNG::getNormal() * 100 + 50);
     player_thread = std::thread(&Player::live, this);
 }
 

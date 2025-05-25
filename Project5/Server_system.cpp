@@ -20,24 +20,32 @@ void Server_system::make_sample() {
 }
 
 Server* Server_system::join_server(Player* player, Server* server) {
-    if (server->joinable) {
-        server->addPlayer(player);
-        return server;
-    }
-    else {
-        return assign_server(player);
-    }
+        if (!assign_server(player, server)) {
+            Server* s_type = server_graph.find_closest(server, server->type);
+            if (server_graph.calc_distance(server, s_type) - player->ping_tolerance < 100) {
+                server = assign_server(player, s_type) ? s_type : nullptr;
+                
+            }
+            else {
+                Server* s_close = server_graph.find_closest(server);
+                server = assign_server(player, s_close) ? s_close : nullptr;
+            }
+        }
+    return server;
 }
 
-Server* Server_system::assign_server(Player* player)
+bool Server_system::assign_server(Player* player, Server* server)
 {
-    for (auto s : server_graph.servers) {
-        if (s.first->joinable) {
-            s.first->addPlayer(player);
-            return s.first;
-        }
+    if (server == nullptr) {
+        return false;
     }
-    return nullptr;
+    if (server->joinable) {
+        server->addPlayer(player);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 Server* Server_system::random_server()
@@ -48,6 +56,11 @@ Server* Server_system::random_server()
     return it->first;
 }
 
+int Server_system::calc_distance(Server* start, Server* server)
+{
+    return server_graph.calc_distance(start, server);
+}
+
 void Server_system::print_info() {
     system("cls");
     std::cout << "Server\tTyp\tPojemnosc\n";
@@ -56,3 +69,10 @@ void Server_system::print_info() {
         std::cout << pair.first->info();
     }
 }
+
+//void Server_system::tick()
+//{
+//    for (auto server : server_graph.servers) {
+//        server.first->tick();
+//    }
+//}

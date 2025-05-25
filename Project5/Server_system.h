@@ -2,6 +2,8 @@
 
 #include <unordered_map>
 #include "Server.h"
+#include <queue>
+#include <set>
 
 class Server_system
 {
@@ -14,10 +16,12 @@ public:
 
     //dla graczy
     Server* join_server(Player* player, Server* server);
-    Server* assign_server(Player* player);
+    bool assign_server(Player* player, Server* server);
     Server* random_server();
+    int calc_distance(Server* start, Server* server);
 
     void print_info();
+    //void tick();
 
 private:
     class Graph {
@@ -64,6 +68,72 @@ private:
             }
         }
 
+        Server* find_closest(Server* start, Server::Type type) {
+            if (start == nullptr) {
+                find_closest(servers.begin()->first, type);
+            }
+
+            std::queue<Server*> to_visit;
+            std::set<Server*> visited;
+
+            to_visit.push(start);
+            visited.insert(start);
+
+            while (!to_visit.empty()) {
+                Server* current = to_visit.front();
+                to_visit.pop();
+
+                if (current->joinable && current->type == type) {
+                    return current;
+                }
+
+                Element* neighbors = servers[current];
+                while (neighbors != nullptr) {
+                    if (visited.find(neighbors->server) == visited.end()) {
+                        to_visit.push(neighbors->server);
+                        visited.insert(neighbors->server);
+                    }
+                    neighbors = neighbors->next;
+                }
+            }
+            return nullptr; 
+        }
+        Server* find_closest(Server* start) {
+            if (start == nullptr) {
+                find_closest(servers.begin()->first);
+            }
+
+            std::queue<Server*> to_visit;
+            std::set<Server*> visited;
+
+            to_visit.push(start);
+            visited.insert(start);
+
+            while (!to_visit.empty()) {
+                Server* current = to_visit.front();
+                to_visit.pop();
+
+                if (current->joinable) {
+                    return current;
+                }
+
+                Element* neighbors = servers[current];
+                while (neighbors != nullptr) {
+                    if (visited.find(neighbors->server) == visited.end()) {
+                        to_visit.push(neighbors->server);
+                        visited.insert(neighbors->server);
+                    }
+                    neighbors = neighbors->next;
+                }
+            }
+            return nullptr;
+        }
+        int calc_distance(Server* start, Server* end) {
+            std::unordered_map<Server*, bool> visited;
+            int distance = dfs_sum_of_distances(start, end, visited);
+            return (distance == INT_MAX) ? -1 : distance;
+        }
+
     private:
         void delete_graph() {
             Graph::Element* current;
@@ -76,6 +146,29 @@ private:
                     current = next;
                 }
             }
+        }
+
+        int dfs_sum_of_distances(Server* current, Server* end, std::unordered_map<Server*, bool>& visited) {
+            if (current == end) {
+                return 0;
+            }
+
+            visited[current] = true;
+            int min_distance = INT_MAX;
+
+            Element* neighbor = servers[current];
+            while (neighbor != nullptr) {
+                if (!visited[neighbor->server]) {
+                    int dist = dfs_sum_of_distances(neighbor->server, end, visited);
+                    if (dist != INT_MAX) {
+                        min_distance = std::min(min_distance, dist + neighbor->weight);
+                    }
+                }
+                neighbor = neighbor->next;
+            }
+
+            visited[current] = false;
+            return min_distance;
         }
     };
 
